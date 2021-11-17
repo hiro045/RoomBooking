@@ -1,3 +1,4 @@
+from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 from . import models, schemas
 
@@ -31,14 +32,23 @@ def create_room(db: Session, room: schemas.Room):
 
 # 予約登録 
 def create_booking(db: Session, booking: schemas.Booking): 
-    db_booking= models.Booking(
-        user_id = booking.user_id,
-        room_id = booking.room_id,
-        booking_num = booking.booking_num,
-        start_datetime = booking.start_datetime,
-        end_datetime = booking.end_datetime
-    )
-    db.add(db_booking)
-    db.commit()
-    db.refresh(db_booking)
-    return db_booking
+    db_booking = db.query(models.Booking).\
+        filter(models.Booking.room_id == booking.room_id).\
+        filter(models.Booking.end_datetime > booking.start_datetime).\
+        filter(models.Booking.start_datetime < booking.end_datetime).\
+        all()
+
+    if len(db_booking) == 0:
+        db_booking= models.Booking(
+            user_id = booking.user_id,
+            room_id = booking.room_id,
+            booking_num = booking.booking_num,
+            start_datetime = booking.start_datetime,
+            end_datetime = booking.end_datetime
+        )
+        db.add(db_booking)
+        db.commit()
+        db.refresh(db_booking)
+        return db_booking
+    else:
+        raise HTTPException(status_code=400, detail='Already Booked')
