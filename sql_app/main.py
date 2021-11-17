@@ -35,13 +35,13 @@ async def read_room(skip: int = 0, limit: int = 10, db: Session = Depends(get_db
 
 # create 
 @app.post('/user', response_model=schemas.User)
-async def read_user(user: schemas.User, db: Session = Depends(get_db)):
+async def read_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.crete_user(db=db, user=user)
 
 @app.post('/room', response_model=schemas.Room)
-async def read_room(room: schemas.Room, db: Session = Depends(get_db)):
+async def read_room(room: schemas.RoomCreaate, db: Session = Depends(get_db)):
     return crud.crete_room(db=db, room=room)
 
 @app.post('/booking', response_model=schemas.Booking)
-async def read_booking(booking: schemas.Booking, db: Session = Depends(get_db)):
+async def read_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)):
     return crud.crete_booking(db=db, booking=booking)
