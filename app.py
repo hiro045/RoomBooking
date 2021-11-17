@@ -164,4 +164,6 @@ elif pages == 'booking':
             res = requests.post(url, data=json.dumps(data))
             if res.status_code == 200:
                 st.success('予約完了')
+            elif res.status_code == 400 and res.json()['detail'] == 'Already Booked':
+                st.error('指定の時間はすでに予約が入っています。')
             st.json(res.json())
